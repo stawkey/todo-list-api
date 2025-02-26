@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TaskService {
+
     private final TaskRepository taskRepository;
 
     TaskService(TaskRepository taskRepository) {
@@ -19,7 +20,7 @@ public class TaskService {
         return taskRepository.findAll(pageRequest);
     }
 
-    public Task save(Task task) {
+    public Task add(Task task) {
         return taskRepository.save(task);
     }
 

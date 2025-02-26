@@ -6,10 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-public class TodoController {
+public class TaskController {
+
     private final TaskService taskService;
 
-    public TodoController(TaskService taskService) {
+    public TaskController(TaskService taskService) {
         this.taskService = taskService;
     }
 
@@ -21,7 +22,7 @@ public class TodoController {
 
     @PostMapping("/todos")
     public Task createTask(@RequestBody Task task) {
-        return taskService.save(task);
+        return taskService.add(task);
     }
 
     @PutMapping("/todos/{id}")
