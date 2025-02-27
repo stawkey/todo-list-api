@@ -16,6 +16,9 @@ public class Task {
     private Integer id;
 
     @NotBlank
+    private Integer userId;
+
+    @NotBlank
     @Size(max = 100)
     private String title;
 
@@ -23,6 +26,16 @@ public class Task {
     private String description;
 
     public Task() {}
+
+    public Task(Integer userId, String title, String description) {
+        this.userId = userId;
+        this.title = title;
+        this.description = description;
+    }
+
+    public Integer getId() {
+        return id;
+    }
 
     public String getTitle() {
         return title;
@@ -32,11 +45,19 @@ public class Task {
         return description;
     }
 
+    public Integer getUserId() {
+        return userId;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 }

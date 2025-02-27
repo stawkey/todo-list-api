@@ -1,5 +1,6 @@
 package io.github.stawkey.todolist.service;
 
+import io.github.stawkey.todolist.dto.UserDTO;
 import io.github.stawkey.todolist.dto.request.RegisterRequest;
 import io.github.stawkey.todolist.entity.User;
 import io.github.stawkey.todolist.repository.UserRepository;
@@ -15,7 +16,7 @@ public class UserService {
     public UserRepository userRepository;
     public PasswordEncoder passwordEncoder;
 
-    public User save(RegisterRequest registerRequest) {
+    public UserDTO save(RegisterRequest registerRequest) {
         if (userRepository.findByEmail(registerRequest.email()).isPresent()) {
             throw new IllegalStateException("Email is already registered");
         }
@@ -27,6 +28,7 @@ public class UserService {
         );
 
         logger.debug("Saving new user: {}", user.getEmail());
-        return userRepository.save(user);
+        userRepository.save(user);
+        return UserDTO.convertToDTO(user);
     }
 }

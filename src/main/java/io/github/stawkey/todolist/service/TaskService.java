@@ -1,5 +1,6 @@
 package io.github.stawkey.todolist.service;
 
+import io.github.stawkey.todolist.dto.TaskDTO;
 import io.github.stawkey.todolist.entity.Task;
 import io.github.stawkey.todolist.repository.TaskRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -8,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import static io.github.stawkey.todolist.dto.TaskDTO.convertToDTO;
 
 @Service
 public class TaskService {
@@ -19,7 +22,7 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public Page<Task> getTasks(int page, int limit) {
+    public Page<TaskDTO> getTasks(int page, int limit) {
         if (page < 0) {
             throw new IllegalArgumentException("Page number cannot be negative");
         }
@@ -29,21 +32,36 @@ public class TaskService {
 
         logger.debug("Fetching tasks page {} with limit {}", page, limit);
         PageRequest pageRequest = PageRequest.of(page, limit);
-        return taskRepository.findAll(pageRequest);
+        return taskRepository.findAll(pageRequest).map(TaskDTO::convertToDTO);
     }
 
-    public Task add(Task task) {
+    public TaskDTO add(TaskDTO taskDTO) {
+        Task task = new Task(
+                taskDTO.userId(),
+                taskDTO.title(),
+                taskDTO.description()
+        );
+
         logger.debug("Adding new task: {}", task.getTitle());
-        return taskRepository.save(task);
+        Task savedTask = taskRepository.save(task);
+        return convertToDTO(savedTask);
     }
 
-    public Task update(Integer id, Task task) {
+    public TaskDTO update(Integer id, TaskDTO taskDTO) {
+        Task task = new Task(
+                taskDTO.userId(),
+                taskDTO.title(),
+                taskDTO.description()
+        );
+
         return taskRepository.findById(id)
                 .map(existingTask -> {
                     existingTask.setTitle(task.getTitle());
                     existingTask.setDescription(task.getDescription());
+                    existingTask.setUserId(task.getUserId());
                     logger.debug("Task updated successfully: {}", id);
-                    return taskRepository.save(existingTask);
+                    Task updatedTask = taskRepository.save(existingTask);
+                    return convertToDTO(updatedTask);
                 })
                 .orElseThrow(() -> new EntityNotFoundException("Task not found with ID: " + id));
     }

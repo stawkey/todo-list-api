@@ -1,6 +1,6 @@
 package io.github.stawkey.todolist.controller;
 
-import io.github.stawkey.todolist.entity.Task;
+import io.github.stawkey.todolist.dto.TaskDTO;
 import io.github.stawkey.todolist.service.TaskService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -15,19 +15,19 @@ public class TaskController {
     }
 
     @GetMapping("/todos")
-    public Page<Task> getTasks(@RequestParam(defaultValue = "0") int page,
+    public Page<TaskDTO> getTasks(@RequestParam(defaultValue = "0") int page,
                                @RequestParam(defaultValue = "10") int limit) {
         return taskService.getTasks(page, limit);
     }
 
     @PostMapping("/todos")
-    public Task createTask(@RequestBody Task task) {
-        return taskService.add(task);
+    public TaskDTO createTask(@RequestBody TaskDTO taskDTO) {
+        return taskService.add(taskDTO);
     }
 
     @PutMapping("/todos/{id}")
-    public Task updateTask(@PathVariable Integer id, @RequestBody Task task) {
-        return taskService.update(id, task);
+    public TaskDTO updateTask(@PathVariable Integer id, @RequestBody TaskDTO taskDTO) {
+        return taskService.update(id, taskDTO);
     }
 
     @DeleteMapping("/todos/{id}")

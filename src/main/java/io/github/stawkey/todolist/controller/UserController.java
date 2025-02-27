@@ -3,7 +3,6 @@ package io.github.stawkey.todolist.controller;
 import io.github.stawkey.todolist.dto.request.RegisterRequest;
 import io.github.stawkey.todolist.dto.response.RegisterResponse;
 import io.github.stawkey.todolist.dto.UserDTO;
-import io.github.stawkey.todolist.entity.User;
 import io.github.stawkey.todolist.dto.request.LoginRequest;
 import io.github.stawkey.todolist.dto.response.LoginResponse;
 import io.github.stawkey.todolist.security.JwtUtil;
@@ -60,11 +59,11 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
-        User savedUser = userService.save(registerRequest);
+        UserDTO savedUser = userService.save(registerRequest);
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(savedUser.getEmail());
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(savedUser.email());
         final String jwt = jwtUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(new RegisterResponse(jwt, UserDTO.fromUser(savedUser)));
+        return ResponseEntity.ok(new RegisterResponse(jwt, savedUser));
     }
 }
