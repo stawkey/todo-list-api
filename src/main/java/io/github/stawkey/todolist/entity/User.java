@@ -14,7 +14,7 @@ public class User {
     private Integer id;
 
     @NotBlank
-    @Size(max = 20)
+    @Size(max = 50)
     private String name;
 
     @NotBlank
@@ -23,10 +23,16 @@ public class User {
     private String email;
 
     @NotBlank
-    @Size(max = 120)
+    @Size(min = 6, max = 50)
     private String password;
 
     public User() {}
+
+    public User(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
 
     public Integer getId() {
         return id;

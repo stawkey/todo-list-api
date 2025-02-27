@@ -1,5 +1,6 @@
 package io.github.stawkey.todolist.config;
 
+import io.github.stawkey.todolist.security.JwtAuthenticationEntryPoint;
 import io.github.stawkey.todolist.security.JwtRequestFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,9 +20,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
 
     private final JwtRequestFilter jwtRequestFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    public WebSecurityConfig(JwtRequestFilter jwtRequestFilter) {
+    public WebSecurityConfig(
+            JwtRequestFilter jwtRequestFilter,
+            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint
+    ) {
         this.jwtRequestFilter = jwtRequestFilter;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     }
 
     @Bean
@@ -35,7 +41,9 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint));
 
         return http.build();
     }

@@ -24,20 +24,12 @@ public class Task {
 
     public Task() {}
 
-    public Integer getId() {
-        return id;
-    }
-
     public String getTitle() {
         return title;
     }
 
     public String getDescription() {
         return description;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public void setTitle(String title) {
