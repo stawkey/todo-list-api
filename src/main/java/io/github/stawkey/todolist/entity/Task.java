@@ -1,11 +1,6 @@
 package io.github.stawkey.todolist.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name="tasks")
@@ -15,14 +10,12 @@ public class Task {
     @GeneratedValue
     private Integer id;
 
-    @NotBlank
+    @Column(name = "user_id", nullable = false)
     private Integer userId;
 
-    @NotBlank
-    @Size(max = 100)
+    @Column(nullable = false)
     private String title;
 
-    @NotBlank
     private String description;
 
     public Task() {}

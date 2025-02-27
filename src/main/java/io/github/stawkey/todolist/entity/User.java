@@ -3,7 +3,6 @@ package io.github.stawkey.todolist.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
@@ -14,16 +13,13 @@ public class User {
     private Integer id;
 
     @NotBlank
-    @Size(max = 50)
     private String name;
 
     @NotBlank
-    @Size(max = 50)
     @Email
     private String email;
 
     @NotBlank
-    @Size(min = 6, max = 50)
     private String password;
 
     public User() {}
