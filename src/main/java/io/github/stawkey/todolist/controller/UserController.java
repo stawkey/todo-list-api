@@ -27,7 +27,6 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/auth")
 public class UserController {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final JwtUtil jwtUtil;
     private final UserService userService;
     private final UserDetailsService userDetailsService;
@@ -47,7 +46,6 @@ public class UserController {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password()));
         } catch (BadCredentialsException e) {
-            logger.error("Invalid credentials");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
