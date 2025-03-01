@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class TaskService {
         this.userService = userService;
     }
 
-    public Page<TaskDTO> getTasks(int page, int limit) {
+    public Page<TaskDTO> getTasks(int page, int limit, String title, Sort.Direction sortDirection, String sortBy) {
         if (page < 0) {
             throw new IllegalArgumentException("Page number cannot be negative");
         }
@@ -40,8 +41,25 @@ public class TaskService {
             throw new AccessDeniedException("User not authenticated");
         }
 
+        Sort sort;
+        if (sortBy != null && !sortBy.isEmpty()) {
+            if (sortDirection == null) {
+                sortDirection = Sort.Direction.ASC;
+            }
+            sort = Sort.by(sortDirection, sortBy);
+        } else {
+            sort = Sort.by(Sort.Direction.ASC, "id");
+        }
+
+        PageRequest pageRequest = PageRequest.of(page, limit, sort);
+
+        if (title != null) {
+            logger.debug("Fetching tasks containing {} for user {} page {} with limit {}", title, userId, page, limit);
+            return taskRepository.findByTitleContainingIgnoreCase(title, pageRequest)
+                    .map(TaskDTO::convertToDTO);
+        }
+
         logger.debug("Fetching tasks for user {} page {} with limit {}", userId, page, limit);
-        PageRequest pageRequest = PageRequest.of(page, limit);
         return taskRepository.findAllByUserId(userId, pageRequest).map(TaskDTO::convertToDTO);
     }
 
@@ -70,7 +88,8 @@ public class TaskService {
                     Task updatedTask = taskRepository.save(existingTask);
                     return convertToDTO(updatedTask);
                 })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found or not owned by current user"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Task not found or not owned by current user"));
     }
 
     @Transactional

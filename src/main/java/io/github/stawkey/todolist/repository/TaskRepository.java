@@ -14,4 +14,6 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     Optional<Task> findByIdAndUserId(Integer id, Integer userId);
     boolean existsByIdAndUserId(Integer id, Integer userId);
     void deleteByIdAndUserId(Integer id, Integer userId);
+
+    Page<Task> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 }

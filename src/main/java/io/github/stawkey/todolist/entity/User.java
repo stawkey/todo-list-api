@@ -10,16 +10,20 @@ public class User {
 
     @Id
     @GeneratedValue
+    @Column(name = "id")
     private Integer id;
 
     @NotBlank
+    @Column(name = "name")
     private String name;
 
     @NotBlank
     @Email
+    @Column(name = "email")
     private String email;
 
     @NotBlank
+    @Column(name = "password")
     private String password;
 
     public User() {}
