@@ -7,6 +7,14 @@ import io.github.stawkey.todolist.dto.request.LoginRequest;
 import io.github.stawkey.todolist.dto.response.LoginResponse;
 import io.github.stawkey.todolist.security.JwtUtil;
 import io.github.stawkey.todolist.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +33,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Authentication API", description = "API for user authentication and registration")
 public class UserController {
 
     private final JwtUtil jwtUtil;
@@ -40,8 +49,18 @@ public class UserController {
         this.jwtUtil = jwtUtil;
     }
 
+    @Operation(summary = "Logs in a user and returns a JWT token")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Successfully logged in, returns JWT token",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class),
+                    examples = @ExampleObject(value = "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"}"))),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials")})
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> createAuthenticationToken(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> createAuthenticationToken(
+            @Parameter(description = "User login credentials", required = true,
+                    schema = @Schema(implementation = LoginRequest.class), examples = @ExampleObject(
+                    value = "{\"email\":\"stawkey@example.com\"," + "\"password\":\"password123\"}")) @Valid
+            @RequestBody LoginRequest loginRequest) {
+
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password()));
@@ -55,8 +74,22 @@ public class UserController {
         return ResponseEntity.ok(new LoginResponse(jwt));
     }
 
+    @Operation(summary = "Registers a new user and returns a JWT token and user data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully registered, returns JWT token and user data",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = RegisterResponse.class), examples = @ExampleObject(
+                            value = "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.." +
+                                    ".\",\"user\":{\"id\":1,\"name\":\"stawkey\",\"email\":\"stawkey@example" +
+                                    ".com\"}}"))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data (e.g., email already exists)")})
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<RegisterResponse> register(
+            @Parameter(description = "Registration data for the new user", required = true,
+                    schema = @Schema(implementation = RegisterRequest.class), examples = @ExampleObject(
+                    value = "{\"name\":\"stawkey\",\"email\":\"stawkey@example.com\"," +
+                            "\"password\":\"password123\"}")) @Valid @RequestBody RegisterRequest registerRequest) {
+
         UserDTO savedUser = userService.save(registerRequest);
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(savedUser.email());
